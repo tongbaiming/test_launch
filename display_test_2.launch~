@@ -1,0 +1,4 @@
+<launch>
+  <node name="gazebo_ros_world" pkg="gazebo_ros" type="gazebo" args="/home/tbm/temp/test_launch/display_test_1.launch" respawn="false" output="screen" />
+	
+</launch>

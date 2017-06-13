@@ -1,0 +1,103 @@
+<launch>
+
+  <arg name="simRate" default="nan"/>
+  <!-- Enable simulation clock -->
+  <param name="use_sim_time" type="bool" value="true" />
+  <!--<include file="$(find mavros)/launch/apm_sitl.launch"></include> -->
+	<!-- use enable_loggin=true make problem -->
+  <!-- <arg name="enable_logging" default="true"/> -->
+  <arg name="enable_logging" default="false" />
+  <arg name="enable_ground_truth" default="true"/>
+  <arg name="log_file" default="erlecopter"/>
+  <arg name="headless" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="world_name" default="$(find ardupilot_sitl_gazebo_plugin)/worlds/empty_world/empty_4.world"/>
+  <env name="GAZEBO_MODEL_PATH" value="$(find drcsim_model_resources)/gazebo_models/environments:$(find ardupilot_sitl_gazebo_plugin)/meshes/meshes_sensors:$(find ardupilot_sitl_gazebo_plugin)/meshes/meshes_outdoor:$(find ardupilot_sitl_gazebo_plugin)/meshes/meshes_warehouse:$(env GAZEBO_MODEL_PATH)"/>
+  <arg name="name" default="erlecopter"/>
+  <arg name="debug" default="true"/>
+  <arg name="verbose" default="true"/>
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="paused" value="false"/>   <!-- value unrelevant due to Arducopter plugin steps --> 
+    <arg name="headless" value="$(arg headless)"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="world_name" value="$(arg world_name)"/>
+  </include>
+  <arg name="mav_type_1" default="erlecopter" />
+  <arg name="addon_type_1" default="guidance" />
+  <arg name="addon_type_2" default="lidar" />
+  <arg name="addon_type_3" default="guidance_lidar" />
+  <arg name="addon_type_3_code" value="3" />
+  <arg name="addon_type_2_code" value="2" />
+  <arg name="addon_type_1_code" value="1" />
+	<arg name="mav_type_1_model_file" default="$(find ardupilot_sitl_gazebo_plugin_test_1)/urdf_test_4/erlecopter_test_2/erlecopter_base.xacro" />
+	<arg name="party_1_mav_instance_1_x" default="1.0" /> <!-- [m], positive to the North -->
+	<arg name="party_1_mav_instance_1_y" default="1.0" /> <!-- [m], negative to the East -->
+	<arg name="party_1_mav_instance_1_z" default="0.10" /> <!-- [m], positive Up -->
+	<arg name="party_1_mav_instance_1_roll" default="0" /> <!-- [rad] -->
+	<arg name="party_1_mav_instance_1_pitch" default="0" /> <!-- [rad] -->
+	<arg name="party_1_mav_instance_1_yaw" default="3.1415926" /> <!-- [rad], negative clockwise -->
+	<arg name="party_1_mav_instance_2_x" default="0" />
+	<arg name="party_1_mav_instance_2_y" default="0" />
+	<arg name="party_1_mav_instance_2_z" default="0.10" />
+	<arg name="party_1_mav_instance_2_roll" default="0" />
+	<arg name="party_1_mav_instance_2_pitch" default="0" />
+	<arg name="party_1_mav_instance_2_yaw" default="3.1415" />
+	<arg name="party_2_mav_instance_1_x" default="0" />
+	<arg name="party_2_mav_instance_1_y" default="0" />
+	<arg name="party_2_mav_instance_1_z" default="0.10" />
+	<arg name="party_2_mav_instance_1_roll" default="0" />
+	<arg name="party_2_mav_instance_1_pitch" default="0" />
+	<arg name="party_2_mav_instance_1_yaw" default="3.1415" />
+	<arg name="party_2_mav_instance_2_x" default="0" />
+	<arg name="party_2_mav_instance_2_y" default="0" />
+	<arg name="party_2_mav_instance_2_z" default="0.10" />
+	<arg name="party_2_mav_instance_2_roll" default="0" />
+	<arg name="party_2_mav_instance_2_pitch" default="0" />
+	<arg name="party_2_mav_instance_2_yaw" default="3.1415" />
+	
+	<group ns="party_1">
+  	<include file="/home/tbm/temp/test_launch/multi_erlecopter_launch_test/spawn_mav_test_1.launch">
+  		<arg name="party_instance" value="1" />
+  		<arg name="mav_instance_in_party" value="1" />
+  		<arg name="spawn_position_x" value="$(arg party_1_mav_instance_1_x)" />
+  		<arg name="spawn_position_y" value="$(arg party_1_mav_instance_1_y)" />
+  		<arg name="spawn_position_z" value="$(arg party_1_mav_instance_1_z)" />
+  		<arg name="mav_type" value="$(arg mav_type_1)" />
+  		<arg name="mav_model_file" value="$(arg mav_type_1_model_file)" />
+  		<arg name="addon_type" value="$(arg addon_type_3)" />
+  		<arg name="addon_code" value="$(arg  addon_type_3_code)" />
+  		<arg name="addon_number" value="1" />
+  		<arg name="enable_logging" value="$(arg enable_logging)" />
+  		<arg name="log_file" value="$(arg log_file)" />
+  		<arg name="enable_ground_truth" value="$(arg enable_ground_truth)" />
+  	</include>
+  	<!--
+  	<include file="/home/tbm/temp/test_launch/multi_erlecopter_launch_test/spawn_mav_test_1.launch">
+  		<arg name="party_instance" value="1" />
+  		<arg name="mav_instance_in_party" value="2" />
+  		<arg name="spawn_position_x" value="$(arg party_1_mav_instance_2_x)" />
+  		<arg name="spawn_position_y" value="$(arg party_1_mav_instance_2_y)" />
+  		<arg name="spawn_position_z" value="$(arg party_1_mav_instance_2_z)" />
+  		<arg name="mav_type" value="$(arg mav_type_1)" />
+  		<arg name="mav_model_file" value="$(arg mav_type_1_model_file)" />
+  		<arg name="addon_type" value="$(arg addon_type_3)" />
+  		<arg name="addon_code" value="$(arg  addon_type_3_code)" />
+  		<arg name="addon_number" value="1" />
+  		<arg name="enable_logging" value="$(arg enable_logging)" />
+  		<arg name="log_file" value="$(arg log_file)" />
+  		<arg name="enable_ground_truth" value="$(arg enable_ground_truth)" />
+  	</include>
+  	-->
+	</group>
+	
+	<!--
+  <group ns="part_2">
+		<param name="robot_description" command="
+    $(find xacro)/xacro.py '$(arg model)'
+    enable_logging:=$(arg enable_logging)
+    enable_ground_truth:=$(arg enable_ground_truth)
+    log_file:=$(arg log_file) mav_type:=erlecopter_guidance"
+  />
+	</group>
+	-->
+</launch>

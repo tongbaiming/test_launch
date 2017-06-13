@@ -1,0 +1,28 @@
+<launch>
+	<arg name="mav_type" default="erlecopter"/>
+	<arg name="addon_type" default="guidance_lidar" />
+	<arg name="enable_logging" default="false" />
+	<arg name="enable_ground_truth" default="true" />
+	<!-- log file has problems-->
+	<arg name="log_file" default="erlecopter" />
+	<arg name="party_instance" default="1" />
+	<arg name="mav_instance_in_party" default="1" />
+	<arg name="addon_number" default="1" />
+	<arg name="addon_code" default="3" />
+	<arg name="mav_model_file" default="$(find ardupilot_sitl_gazebo_plugin_test_1)/urdf_test_4/erlecopter_test_2/erlecopter_base.xacro" /> 
+	<arg name="spawn_position_x" default="0" />
+	<arg name="spawn_position_y" default="0" />
+	<arg name="spawn_position_z" default="0.5" />
+	<param name="instance_$(arg mav_instance_in_party)/$(arg mav_type)_$(arg addon_type)/robot_description" 
+					command="$(find xacro)/xacro.py '$(arg mav_model_file)'
+    							enable_logging:=$(arg enable_logging)
+    							enable_ground_truth:=$(arg enable_ground_truth)
+    							log_file:=$(arg log_file) addon_type:=$(arg addon_type) addon_code:=$(arg addon_code) addon_number:=$(arg addon_number)  mav_instance_in_party:=$(arg mav_instance_in_party) party_instance:=$(arg party_instance)"/>
+    							
+    <node name="spawn_urdf_$(arg mav_instance_in_party)" pkg="gazebo_ros" type="spawn_model" 
+  				args="-param /party_$(arg party_instance)/instance_$(arg mav_instance_in_party)/$(arg mav_type)_$(arg addon_type)/robot_description -urdf 
+  				-x $(arg spawn_position_x) 
+  				-y $(arg spawn_position_y) 
+  				-z $(arg spawn_position_z) 
+  				-model party_$(arg party_instance)/instance_$(arg mav_instance_in_party)/$(arg mav_type)_$(arg addon_type) "/>
+</launch>

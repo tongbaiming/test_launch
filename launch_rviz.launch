@@ -1,0 +1,5 @@
+<launch>
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find urdf_tutorial)/urdf.rviz" required="true" >
+		<remap from="robot_description" to="party_1/instance_1/erlecopter_2/robot_description" />
+	</node>
+</launch>

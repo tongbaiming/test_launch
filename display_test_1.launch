@@ -1,0 +1,7 @@
+<launch>
+  <node name="gazebo_ros_world" pkg="gazebo_ros" type="gazebo" args="/home/tbm/temp/test_world/test_world_1.world" respawn="false" output="screen" />
+	<arg name="model" default="/home/tbm/temp/test_models/models/lidar_test_1/lidar_test_1.urdf"/>
+	<param name="robot_description" textfile="$(arg model)" />
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />	
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find urdf_tutorial)/urdf.rviz" required="true" />
+</launch>

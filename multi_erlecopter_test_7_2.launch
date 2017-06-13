@@ -1,0 +1,17 @@
+<launch>
+
+  <include file="$(find mavros)/launch/apm_sitl.launch">
+  	<arg name="fcu_url" value="tcp://127.0.0.1:5760" />
+  	<arg name="gcs_url" value="udp://127.0.0.1:14555@127.0.0.1:14550" />
+  	<arg name="instance" value="1" />
+  </include>
+  
+  
+  <include file="$(find mavros)/launch/apm_sitl.launch">
+  	<arg name="fcu_url" value="tcp://127.0.0.1:5770" />
+  	<arg name="gcs_url" value="udp://127.0.0.1:14556@127.0.0.1:14560" />
+  	<arg name="instance" value="2" />
+  </include>
+  
+  
+</launch>
