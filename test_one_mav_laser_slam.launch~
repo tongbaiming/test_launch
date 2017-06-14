@@ -46,19 +46,17 @@
     <!--  the native joint_state_publisher can not publish my lidar joint state to tf, So i use my own fixed gazebo_ros_joint_state_publisher in gazebo_ros packages in test_catkin_tools_ws_2 workspace, even if i use non of both joint state publisher the gazebo ros interface plugin in package rotors_simulator can publisher some key joint states to tf. so may be I should test to publisher all the joint states use gazebo_ros_joint_state_publisher-->
     <!-- <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />  -->
      <!-- <node name="waypoint_publisher" pkg="rotors_gazebo" type="waypoint_publisher" output="screen" args="0 0 1 0 5"/> --> 
+		<!-- this is good i load this node from another roslaunch file, for easy to use
     <node name="rotors_kbd_control" pkg="rotors_joy_interface" type="rotors_keyboard_interface" output="screen">
           <remap from="odometry" to="odometry_sensor1/odometry" /> 
     </node>
+		-->
      <node name="laserscan_to_pointcloud2" pkg="laserscan_to_pointcloud2" type="laserscan_to_pointcloud2" output="screen" /> 
     
     <rosparam command="load" file="/home/tbm/temp/test_yaml/laser_slam_worker_params.yaml"  ns="LaserSlamWorker"/>
     <rosparam command="load" file="/home/tbm/temp/test_yaml/laser_track_params.yaml" ns="OnlineEstimator/LaserTrack"/>
     <rosparam command="load" file="/home/tbm/temp/test_yaml/online_estimator_params.yaml" ns="OnlineEstimator"/>
-<<<<<<< HEAD
-    <!-- <node name="test_slam_1" pkg="test_slam_1" type="test_slam_1" /> -->
-=======
     <node name="test_slam_1" pkg="test_slam_1" type="test_slam_1"  output="screen"/>
->>>>>>> 452d37082bbf37a372dbf4931c300ef193a1f8a6
     
     <!-- this is tested is good -->
     <!--
