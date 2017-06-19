@@ -3,7 +3,10 @@
     <group ns="party_1">
         <group ns="instance_1">
             <group ns="erlecopter_2">
-	            <node name="test_slam_1" pkg="test_slam_1" type="test_slam_1"  output="screen"/>
+		<rosparam command="load" file="/home/tbm/temp/test_yaml/laser_slam_worker_params.yaml"  ns="LaserSlamWorker"/>
+    		<rosparam command="load" file="/home/tbm/temp/test_yaml/laser_track_params.yaml" ns="OnlineEstimator/LaserTrack"/>
+    		<rosparam command="load" file="/home/tbm/temp/test_yaml/online_estimator_params.yaml" ns="OnlineEstimator"/>
+	        <node name="test_slam_1" pkg="test_slam_1" type="test_slam_1"  output="screen"/>
             </group>
        </group>
     </group>
