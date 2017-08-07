@@ -1,0 +1,41 @@
+<launch>
+	<arg name="mav_name" default="erlecopter_2"/>
+  <!-- <arg name="world_name" default="basic_2"/> -->
+	<arg name="world_name" default="flat"/>
+  <arg name="enable_logging" default="false" />
+  <arg name="enable_ground_truth" default="true" />
+  <arg name="log_file" default="$(arg mav_name)" />
+  <arg name="debug" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="paused" default="true"/>
+  <!-- The following line causes gzmsg and gzerr messages to be printed to the console
+      (even when Gazebo is started through roslaunch) -->
+  <arg name="verbose" default="false"/>
+<arg name="param_file" default="$(find interface_nbvp_rotors)/resource/exploration.yaml" />
+  <arg name="waypoint_x" default="0" />
+  <arg name="waypoint_y" default="0" />
+  <arg name="waypoint_z" default="1" />
+  <arg name="subscript" default="" />
+  <arg name="tf_frame" default="navigation" />
+ <!--  <arg name="pcl_topic" default="/pointcloudOut" /> -->
+ <arg name="pcl_topic" default="vi_sensor/camera_depth/depth/points" />
+  <arg name="stl_file_path" default="" />
+  <arg name="mesh_resolution" default="1.0" />
+  <arg name="resolution" default="0.4" />
+  <arg name="visualize_max_z" default="2.5" />
+  <arg name="sensor_max_range" default="5.0" />
+  <arg name="peer_vehicle_pose_topic_1" default="peer_pose_1" />
+  <arg name="peer_vehicle_pose_topic_2" default="peer_pose_2" />
+  <arg name="peer_vehicle_pose_topic_3" default="peer_pose_3" />
+	<node name="tbmplanner" pkg="tbmplanner" type="tbmplanner_node" output="screen" launch-prefix="gnome-terminal -e gdb --args">
+		<param name="tf_frame" type="string" value="$(arg tf_frame)" />
+      <param name="resolution" type="double" value="$(arg resolution)" />
+      <param name="visualize_max_z" type="double" value="$(arg visualize_max_z)" />
+      <param name="sensor_max_range" type="double" value="$(arg sensor_max_range)" />
+      <param name="map_publish_frequency" type="double" value="1.0" />
+      <remap from="cam0/camera_info" to="vi_sensor/left/camera_info"/>
+      <remap from="cam1/camera_info" to="vi_sensor/right/camera_info"/>
+      <remap from="pointcloud_throttled" to="$(arg pcl_topic)"/>
+      <remap from="pose" to="ground_truth/pose_with_covariance"/>
+	</node>
+</launch>

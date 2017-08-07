@@ -1,0 +1,124 @@
+<launch>
+  <arg name="mav_name" default="erlecopter_2"/>
+  <!-- <arg name="world_name" default="basic_2"/> -->
+	<arg name="world_name" default="flat"/>
+  <arg name="enable_logging" default="false" />
+  <arg name="enable_ground_truth" default="true" />
+  <arg name="log_file" default="$(arg mav_name)" />
+  <arg name="debug" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="paused" default="true"/>
+  <!-- The following line causes gzmsg and gzerr messages to be printed to the console
+      (even when Gazebo is started through roslaunch) -->
+  <arg name="verbose" default="false"/>
+<arg name="param_file" default="$(find interface_nbvp_rotors)/resource/exploration.yaml" />
+  <arg name="waypoint_x" default="0" />
+  <arg name="waypoint_y" default="0" />
+  <arg name="waypoint_z" default="1" />
+  <arg name="subscript" default="" />
+  <arg name="tf_frame" default="navigation" />
+ <!--  <arg name="pcl_topic" default="/pointcloudOut" /> -->
+ <arg name="pcl_topic" default="vi_sensor/camera_depth/depth/points" />
+  <arg name="stl_file_path" default="" />
+  <arg name="mesh_resolution" default="1.0" />
+  <arg name="resolution" default="0.4" />
+  <arg name="visualize_max_z" default="2.5" />
+  <arg name="sensor_max_range" default="5.0" />
+  <arg name="peer_vehicle_pose_topic_1" default="peer_pose_1" />
+  <arg name="peer_vehicle_pose_topic_2" default="peer_pose_2" />
+  <arg name="peer_vehicle_pose_topic_3" default="peer_pose_3" />
+
+  <env name="GAZEBO_MODEL_PATH" value="$(env GAZEBO_MODEL_PATH)$(find rotors_gazebo)/models"/>
+  <env name="GAZEBO_RESOURCE_PATH" value="${GAZEBO_RESOURCE_PATH}:$(find rotors_gazebo)/models"/>
+  <node pkg="tf" type="static_transform_publisher" name="tf_53" args="0 0 0 0 0 0 world navigation 100" />
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <!-- <arg name="world_name" value="$(find rotors_gazebo)/worlds/$(arg world_name).world" /> -->
+<arg name="world_name" value="$(find interface_nbvp_rotors)/worlds/$(arg world_name).world" />
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="paused" value="$(arg paused)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="verbose" value="$(arg verbose)"/>
+  </include>
+	<group ns="party_1">
+	<group ns="instance_1">
+  <group ns="$(arg mav_name)">
+    <include file="$(find rotors_gazebo)/launch/spawn_mav_tbm_2.launch">
+      <arg name="mav_name" value="$(arg mav_name)" />
+      <arg name="model" value="$(find rotors_description)/urdf/mav_with_vi_sensor.gazebo" />
+      <arg name="enable_logging" value="$(arg enable_logging)" />
+      <arg name="enable_ground_truth" value="$(arg enable_ground_truth)" />
+      <arg name="log_file" value="$(arg log_file)"/>
+      <arg name="namespace" value="party_1/instance_1/$(arg mav_name)" />
+      <arg name="party_instance" value="1" />
+      <arg name="instance_in_party" value="1" />
+    </include>
+    
+    <node name="lee_position_controller_node" pkg="rotors_control" type="lee_position_controller_node" output="screen">
+      <rosparam command="load" file="$(find rotors_gazebo)/resource/lee_controller_$(arg mav_name).yaml" />
+      <rosparam command="load" file="$(find rotors_gazebo)/resource/$(arg mav_name).yaml" />
+      <remap from="odometry" to="odometry_sensor1/odometry" />
+    </node>
+    
+     <!-- <node name="hovering_example" pkg="rotors_gazebo" type="hovering_example" output="screen"/> -->
+    
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen" />
+    <!--  the native joint_state_publisher can not publish my lidar joint state to tf, So i use my own fixed gazebo_ros_joint_state_publisher in gazebo_ros packages in test_catkin_tools_ws_2 workspace, even if i use non of both joint state publisher the gazebo ros interface plugin in package rotors_simulator can publisher some key joint states to tf. so may be I should test to publisher all the joint states use gazebo_ros_joint_state_publisher-->
+    <!-- <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />  -->
+      <!-- this is good can use to test slam in empty world <node name="waypoint_publisher" pkg="rotors_gazebo" type="waypoint_publisher" output="screen" args="0 0 1 0 5"/> -->
+      
+ <node name="nbvPlanner" pkg="nbvplanner" type="nbvPlanner" output="screen">
+      <param name="tf_frame" type="string" value="$(arg tf_frame)" />
+      <param name="resolution" type="double" value="$(arg resolution)" />
+      <param name="visualize_max_z" type="double" value="$(arg visualize_max_z)" />
+      <param name="sensor_max_range" type="double" value="$(arg sensor_max_range)" />
+      <param name="stl_file_path" type="string" value="$(arg stl_file_path)" />
+      <param name="mesh_resolution" type="double" value="$(arg mesh_resolution)" />
+      <param name="map_publish_frequency" type="double" value="1.0" />
+      <remap from="cam0/camera_info" to="vi_sensor/left/camera_info"/>
+      <remap from="cam1/camera_info" to="vi_sensor/right/camera_info"/>
+      <remap from="pointcloud_throttled" to="$(arg pcl_topic)"/>
+      <remap from="pose" to="ground_truth/pose_with_covariance"/>
+      <remap from="nbvplanner" to="nbvplanner"/>
+      <remap from="peer_pose_1" to="$(arg peer_vehicle_pose_topic_1)"/>
+      <remap from="peer_pose_2" to="$(arg peer_vehicle_pose_topic_2)"/>
+      <remap from="peer_pose_3" to="$(arg peer_vehicle_pose_topic_3)"/>
+      <rosparam command="load" file="$(arg param_file)" />
+    </node>
+    <!-- do not launch it in launch file , launch it in eclipse with __ns:= for debug, cannot debug it with gdb, after run , just output of node, no (gdb), so cannot type other order
+	<node name="tbmplanner" pkg="tbmplanner" type="tbmplanner_node" output="screen" launch-prefix="xterm -e">
+		<param name="tf_frame" type="string" value="$(arg tf_frame)" />
+      <param name="resolution" type="double" value="$(arg resolution)" />
+      <param name="visualize_max_z" type="double" value="$(arg visualize_max_z)" />
+      <param name="sensor_max_range" type="double" value="$(arg sensor_max_range)" />
+      <param name="map_publish_frequency" type="double" value="1.0" />
+      <remap from="cam0/camera_info" to="vi_sensor/left/camera_info"/>
+      <remap from="cam1/camera_info" to="vi_sensor/right/camera_info"/>
+      <remap from="pointcloud_throttled" to="$(arg pcl_topic)"/>
+      <remap from="pose" to="ground_truth/pose_with_covariance"/>
+	</node>
+  -->
+    <node name="exploration" pkg="interface_nbvp_rotors" type="exploration" output="screen" >
+      <rosparam command="load" file="$(arg param_file)" />
+    </node>
+		<!-- this is good i load this node from another roslaunch file, for easy to use
+    <node name="rotors_kbd_control" pkg="rotors_joy_interface" type="rotors_keyboard_interface" output="screen">
+          <remap from="odometry" to="odometry_sensor1/odometry" /> 
+    </node>
+		-->
+     <node name="laserscan_to_pointcloud2" pkg="laserscan_to_pointcloud2" type="laserscan_to_pointcloud2" output="screen" /> 
+    
+    <rosparam command="load" file="/home/tbm/temp/test_yaml/laser_slam_worker_params.yaml"  ns="LaserSlamWorker"/>
+    <rosparam command="load" file="/home/tbm/temp/test_yaml/laser_track_params.yaml" ns="OnlineEstimator/LaserTrack"/>
+    <rosparam command="load" file="/home/tbm/temp/test_yaml/online_estimator_params.yaml" ns="OnlineEstimator"/>
+    <!-- <node name="test_slam_1" pkg="test_slam_1" type="test_slam_1"  output="screen"/> -->
+    
+    <!-- this is tested is good -->
+    
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find urdf_tutorial)/urdf.rviz" required="true" >
+	</node>
+	
+	
+  </group>
+  </group>
+  </group>
+</launch>
